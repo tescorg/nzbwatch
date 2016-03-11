@@ -1,8 +1,8 @@
 Requirements
 --------------
-*Ruby
-*Gem "rb-inotify"
-*Systemd
+* Ruby
+* Gem "rb-inotify"
+* Systemd
 
 Configuration
 --------------
