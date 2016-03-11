@@ -1,7 +1,9 @@
 Requirements
 --------------
 Ruby
+
 Gem "rb-inotify"
+
 Systemd
 
 Configuration
