@@ -8,4 +8,4 @@ Group=ross
 ExecStart=/bin/ruby /home/ross/.nzbwatch/nzbwatch.rb
 
 [Install]
-WantedBy=multi-user.target1
+WantedBy=multi-user.target
