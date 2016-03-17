@@ -4,6 +4,11 @@ require "rest-client"
 require "rb-inotify"
 require "yaml"
 
+# Ensure an instance is not already running
+unless File.open($PROGRAM_NAME, "r").flock(File::LOCK_EX | File::LOCK_NB)
+  raise "Already running"
+end
+
 # Assert user's home directory
 if ENV["HOME"].nil? || ENV["HOME"].empty?
   require "etc"
