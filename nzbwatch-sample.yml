@@ -1,0 +1,13 @@
+# Configuration for nzbwatch. Place at ~/.config/nzbwatch/nzbwatch.yml
+
+# Folder to watch
+WatchFolder: ~/Downloads
+
+# If true, the detected NZB will be deleted after SUCCESSFULLY uploaded to Sab
+DeleteNZBPostUpload: false
+
+# API key for SABnzbd (Found in SABnzbd config)
+ApiKey:
+
+# SABnzbd api address (ex. http://localhost:8080/sabnzbd/api)
+SABAddress: http://localhost:8080/sabnzbd/api
