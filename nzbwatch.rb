@@ -1,16 +1,15 @@
 #!/usr/bin/ruby
 
-#require './nzbwatch.conf.rb'
 require 'rest-client'
 require 'rb-inotify'
 require 'yaml'
 
 # Assert user's home directory
-if (ENV["HOME"].nil? || ENV["HOME"].empty?)
+if ENV['WatchFolder'].nil? || ENV['HOME'].empty?
   require 'etc'
-  ENV["HOME"] = Etc.getpwuid.dir
+  ENV['HOME'] = Etc.getpwuid.dir
 end
-home_dir = ENV["HOME"]
+home_dir = ENV['HOME']
 
 if (home_dir.nil? || home_dir.empty?)
   raise "Could not assert home directory"
@@ -33,21 +32,21 @@ end
 
 config = YAML.load_file config_filepath
 
-if config["WatchFolder"].nil? || config["WatchFolder"].empty?
+if config['WatchFolder'].nil? || config['WatchFolder'].empty?
   raise "Watch folder not configured"
 end
 
-config["WatchFolder"] = File.expand_path config["WatchFolder"]
+config['WatchFolder'] = File.expand_path config['WatchFolder']
 
-unless File.directory? config["WatchFolder"]
-  raise "Watch folder #{config["WatchFolder"]} does not exist"
+unless File.directory? config['WatchFolder']
+  raise "Watch folder #{config['WatchFolder']} does not exist"
 end
 
-if config["ApiKey"].nil? || config["ApiKey"].empty?
+if config['ApiKey'].nil? || config['ApiKey'].empty?
   raise "API Key not configured"
 end
 
-if config["SABAddress"].nil? || config["SABAddress"].empty?
+if config['SABAddress'].nil? || config['SABAddress'].empty?
   raise "SABnzbd api address not configured"
 end
 
@@ -73,9 +72,9 @@ notifier.watch(config["WatchFolder"], :moved_to, :create) do |event|
   if filetype == "nzb"
     begin
     RestClient.post(
-      config["SABAddress"],
+      config['SABAddress'],
       nzbfile: File.new(filename),
-      apikey: config["ApiKey"],
+      apikey: config['ApiKey'],
       mode: "addfile"
     )
 
