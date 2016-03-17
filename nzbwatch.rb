@@ -56,6 +56,9 @@ end
 config["DeleteNZBPostUpload"] = false if config["DeleteNZBPostUpload"].nil?
 
 # Now start the INotify loop
+
+puts "Monitoring for NZBs in #{config["WatchFolder"]} ..."
+
 notifier = INotify::Notifier.new
 
 notifier.watch(config["WatchFolder"], :moved_to, :create) do |event|
@@ -65,6 +68,7 @@ notifier.watch(config["WatchFolder"], :moved_to, :create) do |event|
   filetype = filename.split(".")[-3] if filetype == "tar"
 
   if filetype == "nzb"
+    print "Found nzb #{filename} ... "
     begin
 
       RestClient.post(
@@ -74,10 +78,12 @@ notifier.watch(config["WatchFolder"], :moved_to, :create) do |event|
         mode: "addfile"
       )
 
+      puts "Upload successful"
+
       File.delete(filename) if config["DeleteNZBPostUpload"]
 
     rescue => exception
-      puts "Error uploading NZB to SABnzbd", exception.message
+      puts "Upload failed", exception.message
     end
   end
 end
