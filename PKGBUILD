@@ -1,12 +1,12 @@
 pkgname=nzbwatch
 _gitname=nzbwatch
 pkgver=1
-pkgrel=2
+pkgrel=3
 pkgdesc="Watch a folder for new NZB files and automatically upload to SABnzbd"
 arch=('any')
 url="https://github.com/tescorg/nzbwatch"
 license=()
-depends=('ruby', 'ruby-rb-inotify')
+depends=('ruby' 'ruby-rb-inotify')
 makedepends=('git')
 optdepends=('sabnzbd')
 install=
