@@ -1,6 +1,6 @@
 pkgname=nzbwatch-git
 _gitname=nzbwatch
-pkgver=r20.8a79065
+pkgver=1
 pkgrel=1
 pkgdesc="Watch a folder for new NZB files and automatically upload to SABnzbd"
 arch=('any')
