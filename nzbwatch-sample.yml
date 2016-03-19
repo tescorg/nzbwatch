@@ -3,7 +3,15 @@
 # Folder to watch
 WatchFolder: ~/Downloads
 
-# If true, the detected NZB will be deleted after SUCCESSFULLY uploaded to Sab
+# If set, a detected NZB will be moved to the specified folder after SUCCESFULLY
+# uploaded to SABnzbd
+# - Directory must have write permissions
+# - Conflicts with DeleteNZBPostUpload
+# - Leave blank or false to disable
+ArchiveFolder:
+
+# If true, a detected NZB will be deleted after SUCCESSFULLY uploaded to SABnzbd
+# - Conflicts with ArchiveFolder
 DeleteNZBPostUpload: false
 
 # API key for SABnzbd (Found in SABnzbd config)

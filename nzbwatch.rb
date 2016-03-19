@@ -39,6 +39,10 @@ if config["WatchFolder"].nil? || config["WatchFolder"].empty?
   raise "Watch folder not configured"
 end
 
+unless config["WatchFolder"].is_a? String
+  raise "WatchFolder must be a folder path"
+end
+
 config["WatchFolder"] = File.expand_path config["WatchFolder"]
 
 unless File.directory? config["WatchFolder"]
@@ -55,6 +59,30 @@ end
 
 config["DeleteNZBPostUpload"] = false if config["DeleteNZBPostUpload"].nil?
 
+config["ArchiveFolder"] = false if config["ArchiveFolder"].nil?
+
+if config["DeleteNZBPostUpload"] && config["ArchiveFolder"]
+  raise "DeleteNZBPostUpload and ArchiveFolder cannot be enabled simultaneously"
+end
+
+if config["ArchiveFolder"]
+  require "fileutils"
+
+  unless config["ArchiveFolder"].is_a? String
+    raise "ArchiveFolder must be a folder path"
+  end
+
+  config["ArchiveFolder"] = File.expand_path config["ArchiveFolder"]
+
+  unless File.directory? config["ArchiveFolder"]
+    raise "Archive folder #{config["ArchiveFolder"]} does not exist"
+  end
+
+  unless File.writable? config["ArchiveFolder"]
+    raise "No write permission for archive folder #{config["ArchiveFolder"]}"
+  end
+end
+
 # Now start the INotify loop
 
 puts "Monitoring for NZBs in #{config["WatchFolder"]} ..."
@@ -63,9 +91,10 @@ notifier = INotify::Notifier.new
 
 notifier.watch(config["WatchFolder"], :moved_to, :create) do |event|
   filename = event.absolute_name
-  filetype = filename.split(".")[-1]
-  filetype = filename.split(".")[-2] if filetype == "zip" || filetype == "gz"
-  filetype = filename.split(".")[-3] if filetype == "tar"
+  basename = File.basename(filename)
+  filetype = basename.split(".")[-1]
+  filetype = basename.split(".")[-2] if filetype == "zip" || filetype == "gz"
+  filetype = basename.split(".")[-3] if filetype == "tar"
 
   if filetype == "nzb"
     print "Found nzb #{filename} ... "
@@ -81,6 +110,13 @@ notifier.watch(config["WatchFolder"], :moved_to, :create) do |event|
       puts "Upload successful"
 
       File.delete(filename) if config["DeleteNZBPostUpload"]
+
+      if config["ArchiveFolder"]
+        FileUtils.mv(
+          filename,
+          File.absolute_path(basename, config["ArchiveFolder"])
+        )
+      end
 
     rescue => exception
       puts "Upload failed", exception.message
