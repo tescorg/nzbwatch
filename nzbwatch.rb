@@ -92,12 +92,32 @@ notifier = INotify::Notifier.new
 notifier.watch(config["WatchFolder"], :moved_to, :create) do |event|
   filename = event.absolute_name
   basename = File.basename(filename)
-  filetype = basename.split(".")[-1]
-  filetype = basename.split(".")[-2] if filetype == "zip" || filetype == "gz"
-  filetype = basename.split(".")[-3] if filetype == "tar"
 
-  if filetype == "nzb"
-    print "Found nzb #{filename} ... "
+  # Lets figure out if the discovered file is an NZB, or an archive that
+  # contains an NZB (zip or gzip).
+  begin
+    case basename
+    when /(\.nzb|\.nzb\.zip|\.nzb\.gz)$/i
+      is_an_nzb = true
+    when /(\.zip)$/i
+      require "zip"
+      Zip::File.open filename do |zip_file|
+        zip_file.each do |entry|
+          is_an_nzb = true if entry.name.split(".")[-1] == "nzb"
+        end
+      end
+    when /(?<!\.tar)\.gz$/i # .gz not preceded by a .tar
+      require "zlib"
+      Zlib::GzipReader.open filename do |gzip_file|
+        is_an_nzb = true if gzip_file.orig_name.split(".")[-1] == "nzb"
+      end
+    end
+  rescue => exception
+    puts exception.message
+  end
+
+  if is_an_nzb
+    print "Found #{filename} ... "
     begin
 
       RestClient.post(
